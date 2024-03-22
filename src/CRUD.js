@@ -106,7 +106,7 @@ const CRUD = () => {
         handleClose();
         getData();
         clear();
-        toast.info('Employee has been Updted');
+        toast.info('Employee has been Updated');
       }).catch((error) => {
         toast.error(error)
       })
