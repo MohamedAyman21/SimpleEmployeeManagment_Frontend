@@ -15,20 +15,20 @@ const CRUD = () => {
   const [show, setShow] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  const handleClose = () => setShow(false);
+  const handleCloseEdit = () => setShow(false);
   const handleCloseDelete = () => setShowDelete(false);
 
-  const handleShow = () => setShow(true);
+  const handleShowEdit = () => setShow(true);
   const handleShowDelete = () => setShowDelete(true);
 
   const [name, setName] = useState('')
   const [age, setAge] = useState('')
-  const [isActive, setIsActive] = useState(false)
+  const [isActive, setIsActive] = useState(0)
 
   const [editID, setEditID] = useState('')
   const [editName, setEditName] = useState('')
   const [editAge, setEditAge] = useState('')
-  const [editIsActive, setEditIsActive] = useState(false)
+  const [editIsActive, setEditIsActive] = useState(0)
   const [deleteID, setDeleteID] = useState(0);
 
   const [data, setData] = useState([]);
@@ -51,27 +51,27 @@ const CRUD = () => {
 
   const handleActiveChange = (e) => {
     if (e.target.checked) {
-      setIsActive(true);
+      setIsActive(1);
     }
     else {
-      setIsActive(false);
+      setIsActive(0);
     }
   }
   const handleEditActiveChange = (e) => {
     if (e.target.checked) {
-      setEditIsActive(true);
+      setEditIsActive(1);
     }
     else {
-      setEditIsActive(false);
+      setEditIsActive(0);
     }
   }
   const handleEdit = (id) => {
-    handleShow();
+    handleShowEdit();
     axios.get(`https://localhost:44311/api/Employee/${id}`)
       .then((result) => {
         setEditName(result.data.name);
         setEditAge(result.data.age);
-        setEditIsActive(result.data.isActive);
+        setEditIsActive(result.data.isActive === true ? 1 : 0);
         setEditID(id);
       })
   }
@@ -99,11 +99,11 @@ const CRUD = () => {
       "id": editID,
       "name": editName,
       "age": editAge,
-      "isActive": editIsActive
+      "isActive": editIsActive === 1 ? true : false
     }
     axios.put(url, data)
       .then((result) => {
-        handleClose();
+        handleCloseEdit();
         getData();
         clear();
         toast.info('Employee has been Updated');
@@ -116,15 +116,16 @@ const CRUD = () => {
     const data = {
       "name": name,
       "age": age,
-      "isActive": isActive
+      "isActive": isActive === 1 ? true : false
     }
+
     axios.post(url, data)
       .then((result) => {
         getData();
         clear();
         toast.success('Employee has been added');
       }).catch((error) => {
-        toast.error(error)
+        getData();
       })
   }
   const clear = () => {
@@ -149,7 +150,7 @@ const CRUD = () => {
           </Col>
           <Col style={{ verticalAlign: 'center' }}>
             <input type="checkbox" style={{ margin: '5px' }}
-              checked={isActive === true ? true : false}
+              checked={isActive === 1 ? true : false}
               onChange={(e) => handleActiveChange(e)} value={isActive} />
             <label>Is Active.</label>
           </Col>
@@ -163,9 +164,9 @@ const CRUD = () => {
         <thead>
           <tr>
             <th>#</th>
-            <th> Name</th>
-            <th>age</th>
-            <th>isActive</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Is Active</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -198,7 +199,7 @@ const CRUD = () => {
         </tbody>
       </Table>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={handleCloseEdit}>
         <Modal.Header closeButton>
           <Modal.Title>Modify / Update Employee</Modal.Title>
         </Modal.Header>
@@ -211,7 +212,7 @@ const CRUD = () => {
             </Col>
             <Col style={{ alignContent: 'center' }}>
               <input type="checkbox" style={{ margin: '5px' }}
-                checked={editIsActive === true ? true : false} onChange={(e) => handleEditActiveChange(e)} value={editIsActive} />
+                checked={editIsActive === 1 ? true : false} onChange={(e) => handleEditActiveChange(e)} value={editIsActive} />
               <label>Is Active.</label>
             </Col>
           </Row>
@@ -220,7 +221,7 @@ const CRUD = () => {
           <Button variant="primary" onClick={handleUpdate}>
             Save Changes
           </Button>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleCloseEdit}>
             Close
           </Button>
         </Modal.Footer>
